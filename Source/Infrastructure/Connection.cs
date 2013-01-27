@@ -25,33 +25,29 @@ using log4net;
 
 namespace Aura {
 	/// <summary>
-	/// This class coordinates the connection strings for Mongol.  By default it will read connection strings from the appSettings elements.  &quot;Mongol.Url&quot; is the key for the default connection.
-	/// Specific named connections can be specified in appSettings as &quot;Mongol.Url.CONNECTIONNAME&quot;.  Alternatively, connections can be explicitly configured by the application by calling AddConnection.
+	/// This class coordinates the connection strings for Aura.  By default it will read connection strings from the connectionSettings elements.
+	/// You can retrieve connections by name. If there's only connection, it will default to that.
+    /// If you are using DatabaseManager, name your DatabaseManager subclass the same as the connection string name
 	/// </summary>
-	internal static class Connection {
-		private const string appSettingPrefix = "Mongol.Url";
-
+	public static class Connection {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		private static Dictionary<string, MongoUrl> connections;
 		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
 
 		static Connection() {
 			connections = new Dictionary<string, MongoUrl>();
-			foreach (String key in ConfigurationManager.AppSettings.Keys) {
-				if (key.StartsWith(appSettingPrefix)) {
-					if (key.Equals(appSettingPrefix)) {
-						logger.Debug(String.Format("Initialized Mongol Connection:[default] - {0}",ConfigurationManager.AppSettings[key]));
-						connections.Add(String.Empty, new MongoUrl(ConfigurationManager.AppSettings[key]));
-					}
-					else {
-						if (key.StartsWith(appSettingPrefix + ".")) {
-							string connectionName = key.Substring(appSettingPrefix.Length + 1);
-							logger.Debug(String.Format("Initialized Mongol Connection:{0} - {1}", connectionName, ConfigurationManager.AppSettings[key]));
-							connections.Add(connectionName, new MongoUrl(ConfigurationManager.AppSettings[key]));
-						}
-					}
-				}
-			}
+
+            for(var i = 0; i < ConfigurationManager.ConnectionStrings.Count; i++)
+            {
+                ConnectionStringSettings connectionSetting = ConfigurationManager.ConnectionStrings[i];
+
+                if (connectionSetting.ConnectionString.StartsWith("mongodb://"))
+                {
+                    string connectionName = connectionSetting.Name;
+                    logger.Debug(String.Format("Initialized Aura Connection:{0} - {1}", connectionName, connectionSetting.ConnectionString));
+                    connections.Add(connectionName, new MongoUrl(connectionSetting.ConnectionString));
+                }
+            }
 		}
 
 		/// <summary>
@@ -88,9 +84,8 @@ namespace Aura {
 		private static MongoUrl GetMongolUrlByName(string Name) {
 			rwl.EnterReadLock();
 			try {
-				string suffix = String.IsNullOrEmpty(Name) ? null : suffix = "." + Name;
 				if (!connections.ContainsKey(Name)) {
-					throw new ConfigurationErrorsException("Missing AppSetting Mongol.Url" + suffix);
+					throw new ConfigurationErrorsException("Missing ConnectionString " + Name);
 				}
 				return connections[Name];
 			}

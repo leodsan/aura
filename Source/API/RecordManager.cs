@@ -44,7 +44,7 @@ namespace Aura {
         internal List<String> RemovedFields { get; set; }
 
         /// <summary>
-        /// The name of the Mongol connection to use. 
+        /// The name of the Aura connection to use. 
         /// </summary>
         public string ConnectionName
         {
@@ -518,7 +518,7 @@ namespace Aura {
 		/// Executes an aggregation command using the specified pipeline
 		/// </summary>
         /// <param name="operations">A params array of BsonDocuments representing aggregation commands</param>
-		/// <remarks>Use the Mongol.Aggregation class convenience methods to generate pipeline commands</remarks>
+		/// <remarks>Use the Aura.Aggregation class convenience methods to generate pipeline commands</remarks>
 		/// <returns>An enumerable list of the aggregation results</returns>
         protected IEnumerable<BsonDocument> Aggregate(params BsonDocument[] operations)
         {
@@ -530,7 +530,7 @@ namespace Aura {
 		/// Executes an aggregation command using the specified pipeline
 		/// </summary>
         /// <param name="operations">An array of BsonDocuments representing aggregation commands</param>
-		/// <remarks>Use the Mongol.Aggregation class convenience methods to generate pipeline commands</remarks>
+		/// <remarks>Use the Aura.Aggregation class convenience methods to generate pipeline commands</remarks>
 		/// <returns>An enumerable list of the aggregation results</returns>
 		protected IEnumerable<BsonDocument> Aggregate(IEnumerable<BsonDocument> operations) {
             var results = collection.Aggregate(operations);
@@ -541,7 +541,7 @@ namespace Aura {
 		/// Executes an aggregation command using the specified pipeline
 		/// </summary>
         /// <param name="operations">A params array of BsonDocuments representing aggregation commands</param>
-		/// <remarks>Use the Mongol.Aggregation class convenience methods to generate pipeline commands</remarks>
+		/// <remarks>Use the Aura.Aggregation class convenience methods to generate pipeline commands</remarks>
 		/// <returns>An strongly typed enumerable of the aggregation results</returns>
         protected IEnumerable<TReturnType> Aggregate<TReturnType>(params BsonDocument[] operations)
         {
@@ -553,7 +553,7 @@ namespace Aura {
 		/// Executes an aggregation command using the specified pipeline
 		/// </summary>
         /// <param name="operations">A params array of BsonDocuments representing aggregation commands</param>
-		/// <remarks>Use the Mongol.Aggregation class convenience methods to generate pipeline commands</remarks>
+		/// <remarks>Use the Aura.Aggregation class convenience methods to generate pipeline commands</remarks>
 		/// <returns>A strongly typed enumerable of the aggregation results</returns>
         protected IEnumerable<TReturnType> Aggregate<TReturnType>(IEnumerable<BsonDocument> operations)
         {
