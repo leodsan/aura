@@ -28,6 +28,18 @@ namespace Aura {
 
 		private static Dictionary<object, T> cache = new Dictionary<object, T>();
 
+        public CachingRecordManager(bool isDbManaged)
+            : base(isDbManaged)
+        {
+
+        }
+
+        public CachingRecordManager(string collectionName = null, string connectionName = null)
+            : base(collectionName, connectionName)
+        {
+
+        }
+
 		/// <summary>
 		/// Retrieves an object by Id and caches the retrieval by Id for future lookup.
 		/// </summary>
