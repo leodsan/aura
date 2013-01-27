@@ -47,6 +47,16 @@ namespace Aura
 
         private void InitRecordManagers()
         {
+            bool hasServiceLocator = false;
+
+            try {
+                if(ServiceLocator.Current != null){
+                    hasServiceLocator = true;
+                }
+            } catch(NullReferenceException){
+                hasServiceLocator = false;
+            }
+
             RecordManagers = new Dictionary<Type, IRecordManager>();
 
             var properties = GetType().GetProperties().Where(p => p.PropertyType.GetInterfaces().Contains(typeof(IRecordManager)));
@@ -69,15 +79,27 @@ namespace Aura
                     genericType = property.PropertyType.GetInterfaces().First(p => p.IsGenericType).GetGenericArguments()[0];
                 }
 
-                if (ServiceLocator.Current != null)
+                if (hasServiceLocator)
                 {
-                    instance = ServiceLocator.Current.GetInstance(property.PropertyType);
+                    try
+                    {
+                        instance = ServiceLocator.Current.GetInstance(property.PropertyType);
+                    }
+                    catch (ActivationException)
+                    {
+                        instance = null;
+                    }
                 }
 
-                if (instance == null)
+                if (instance == null && property.PropertyType.IsInterface)
                 {
                     type = typeof(RecordManager<>).MakeGenericType(genericType);
                     instance = Activator.CreateInstance(type,true);
+                }
+
+                if (instance == null && property.PropertyType.IsClass)
+                {
+                    instance = Activator.CreateInstance(property.PropertyType, true);
                 }
 
                 if (instance is RecordManager)
@@ -86,11 +108,18 @@ namespace Aura
                     recordManagerInstance.SetupManager(collectionName: null, connectionName: DatabaseName);
                 }
 
-                property.SetValue(this, instance, null);
-
-                if (genericType != null)
+                if (instance == null)
                 {
-                    RecordManagers[genericType] = (IRecordManager)instance;
+                    throw new ApplicationException("Could not initialize an instance for: " + property.Name);
+                }
+                else
+                {
+                    property.SetValue(this, instance, null);
+
+                    if (genericType != null)
+                    {
+                        RecordManagers[genericType] = (IRecordManager)instance;
+                    }
                 }
             }
         }

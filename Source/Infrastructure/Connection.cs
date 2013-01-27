@@ -82,6 +82,12 @@ namespace Aura {
 		}
 
 		private static MongoUrl GetMongolUrlByName(string Name) {
+
+            if (String.IsNullOrEmpty(Name) && connections.Count == 1)
+            {
+                return connections.Values.Single();
+            }
+
 			rwl.EnterReadLock();
 			try {
 				if (!connections.ContainsKey(Name)) {
