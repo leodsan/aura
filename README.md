@@ -1,5 +1,5 @@
 # Aura Project
-Welcome! Mongol is a very simple wrapper library for 10gen's [Official MongoDB C#/.NET Driver](http://www.mongodb.org/display/DOCS/CSharp+Language+Center) that helps shortcut some repetitive tasks when building applications that use MongoDB to store documents in strongly-typed collections.
+Welcome! Aura is a very simple wrapper library for 10gen's [Official MongoDB C#/.NET Driver](http://www.mongodb.org/display/DOCS/CSharp+Language+Center) that helps shortcut some repetitive tasks when building applications that use MongoDB to store documents in strongly-typed collections.
 
 ## Quick Start
 The easiest way to get started with Aura is to
