@@ -135,6 +135,11 @@ namespace Aura {
 		private static bool Initialized = false;
 
         /// <summary>
+        /// Used to track if this RecordManager is being managed by a DatabaseManager
+        /// </summary>
+        private static bool IsDbManaged = false;
+
+        /// <summary>
         /// Creates a new RecordManager
         /// </summary>
         public RecordManager(bool isDbManaged)
@@ -143,6 +148,8 @@ namespace Aura {
             {
                 SetupManager(null, null);
             }
+
+            IsDbManaged = isDbManaged;
         }
 
         internal override void SetupManager(string collectionName, string connectionName)
@@ -468,7 +475,11 @@ namespace Aura {
             Indexes.Add(new RecordManagerIndex { Keys = keys, Options = options });
 
 			logger.Debug(String.Format("EnsureIndex({0},{1})", keys, options));
-			collection.EnsureIndex(keys, options);
+
+            if (!IsDbManaged)
+            {
+                collection.EnsureIndex(keys, options);
+            }
 		}
 
 		/// <summary>

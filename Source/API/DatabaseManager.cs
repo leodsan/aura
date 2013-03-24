@@ -148,7 +148,8 @@ namespace Aura
                         foreach (var neededIndex in neededIndexes)
                         {
 
-                            BsonDocument neededIndexDoc = neededIndex.ToBsonDocument().GetElement("Keys").Value.ToBsonDocument();
+                            BsonDocument neededIndexKeysDoc = neededIndex.ToBsonDocument().GetElement("Keys").Value.ToBsonDocument();
+                            BsonDocument neededIndexOptionsDoc = neededIndex.ToBsonDocument().GetElement("Options").Value.ToBsonDocument();
 
                             int matchedKeys = 0;
 
@@ -159,7 +160,7 @@ namespace Aura
 
                                 BsonElement matchedElem = null;
 
-                                if (neededIndexDoc.TryGetElement(field,out matchedElem))
+                                if (neededIndexKeysDoc.TryGetElement(field,out matchedElem))
                                 {
                                     if (matchedElem.Value.AsInt32 == direction)
                                     {
@@ -168,11 +169,36 @@ namespace Aura
                                 }
                             }
 
-                            if (matchedKeys == key.Elements.Count() && matchedKeys == neededIndexDoc.Elements.Count())
+                            if (matchedKeys == key.Elements.Count() && matchedKeys == neededIndexKeysDoc.Elements.Count())
                             {
                                 doRemove = false;
-                                break;
 
+                                bool isUnique = false;
+                                bool isSparse = false;
+
+                                BsonElement value;
+
+                                if (neededIndexOptionsDoc.TryGetElement("unique", out value))
+                                {
+                                    isUnique = value.Value.ToBoolean();
+                                }
+
+                                if (neededIndexOptionsDoc.TryGetElement("sparse", out value))
+                                {
+                                    isSparse = value.Value.ToBoolean();
+                                }
+
+                                if (index.IsUnique != isUnique)
+                                {
+                                    doRemove = true;
+                                }
+
+                                if (index.IsSparse != isSparse)
+                                {
+                                    doRemove = true;
+                                }
+
+                                break;
                             }
                         }
 
@@ -181,6 +207,11 @@ namespace Aura
                             logger.Debug("Dropping unused index " + index.Name + " from collection " + collection.Name);
                             collection.DropIndexByName(index.Name);
                         }
+                    }
+
+                    foreach (var index in recordManager.Indexes)
+                    {
+                        collection.EnsureIndex(index.Keys, index.Options);
                     }
                 }
 
