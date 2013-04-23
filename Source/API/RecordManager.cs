@@ -22,6 +22,13 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Linq;
 using log4net;
 namespace Aura {
+
+    /// <summary>
+    /// Delegate that is called when RemoveProperty is invoked with the callback parameter.
+    /// </summary>
+    /// <param name="documents">The collection of documents that have the property to be removed</param>
+    public delegate void RecordManagerRemovePropertyCallback(IEnumerable<BsonDocument> documents);
+
 	/// <summary>
 	/// The untyped RecordManager manager class is used to collect any constants, or statics that may be useful without needing to have a particular typed instance.
 	/// </summary>
@@ -41,7 +48,7 @@ namespace Aura {
             public IMongoIndexOptions Options { get; set; }
         }
 
-        internal List<String> RemovedFields { get; set; }
+        internal List<KeyValuePair<string, RecordManagerRemovePropertyCallback>> RemovedFields { get; set; }
 
         /// <summary>
         /// The name of the Aura connection to use. 
@@ -80,9 +87,24 @@ namespace Aura {
         {
             if (RemovedFields == null)
             {
-                RemovedFields = new List<string>();
+                RemovedFields = new List<KeyValuePair<string, RecordManagerRemovePropertyCallback>>();
             }
-            RemovedFields.Add(propertyName);
+            RemovedFields.Add(new KeyValuePair<string, RecordManagerRemovePropertyCallback>(propertyName, null));
+        }
+        /// <summary>
+        /// Removes the specified property from all documents in the collection. Useful during schema migration. By specifying a callback, you can migrate data from old fields to new fields.
+        /// </summary>
+        /// <param name="propertyName">The name of the property to remove from the collection</param>
+        /// <param name="callback">The callback to call with the collection of documents that have the removed property.</param>
+
+        protected void RemoveProperty(string propertyName, RecordManagerRemovePropertyCallback callback)
+        {
+            if (RemovedFields == null)
+            {
+                RemovedFields = new List<KeyValuePair<string, RecordManagerRemovePropertyCallback>>();
+            }
+
+            RemovedFields.Add(new KeyValuePair<string, RecordManagerRemovePropertyCallback>(propertyName, callback));
         }
 	}
 
@@ -505,7 +527,7 @@ namespace Aura {
 				logger.Error("Attempted to call QueryCriteriaById with a null Id");
 				throw new ArgumentNullException("Id", "Cannot QueryCriteriaById with a null Id");
 			}
-			return Query.In(ID_FIELD, BsonArray.Create(IdList));
+			return Query.In(ID_FIELD, new BsonArray(IdList));
 		}
 
 		/// <summary>

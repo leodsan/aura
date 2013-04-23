@@ -63,7 +63,7 @@ namespace Aura {
 		}
 
         /// <summary>
-        /// Gets all items in database
+        /// Gets all items in collection
         /// </summary>
         /// <returns></returns>
         public IEnumerable<T> GetAll()
@@ -76,6 +76,9 @@ namespace Aura {
             return cache.Values.ToList();
         }
 
+        /// <summary>
+        /// All of the Values in the the collection
+        /// </summary>
         protected IEnumerable<T> Values
         {
             get

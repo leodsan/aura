@@ -86,7 +86,7 @@ namespace Aura {
 		public static BsonDocument Group(BsonElement GroupBy, IEnumerable<BsonElement> Aggregations) {
 			var value = new BsonDocument(GroupBy);
 			if (Aggregations != null && Aggregations.Any()) {
-				value.Add(Aggregations);
+                value.AddRange(Aggregations);
 			}
 			return new BsonDocument() { { "$group", value } };
 		}

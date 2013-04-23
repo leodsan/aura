@@ -219,10 +219,19 @@ namespace Aura
                 {
                     foreach (var removedField in recordManager.RemovedFields)
                     {
-                        if (collection.Count(Query.Exists(removedField)) > 0)
+                        var removedFieldName = removedField.Key;
+                        var removedFieldCallback = removedField.Value;
+
+                        if (collection.Count(Query.Exists(removedFieldName)) > 0)
                         {
                             logger.Debug("Removing field " + removedField + " from collection " +  collection.Name);
-                            collection.Update(Query.Null, Update.Unset(removedField), UpdateFlags.Multi);
+
+                            if (removedFieldCallback != null)
+                            {
+                                removedFieldCallback(collection.FindAs<BsonDocument>(Query.Exists(removedFieldName)));
+                            }
+
+                            collection.Update(Query.Null, Update.Unset(removedFieldName), UpdateFlags.Multi);
                         }
                     }
                 }
