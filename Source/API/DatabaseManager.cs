@@ -149,7 +149,14 @@ namespace Aura
                         {
 
                             BsonDocument neededIndexKeysDoc = neededIndex.ToBsonDocument().GetElement("Keys").Value.ToBsonDocument();
-                            BsonDocument neededIndexOptionsDoc = neededIndex.ToBsonDocument().GetElement("Options").Value.ToBsonDocument();
+
+                            BsonValue neededIndexOptionsValue = neededIndex.ToBsonDocument().GetElement("Options").Value;
+                            BsonDocument neededIndexOptionsDoc = null;
+
+                            if (!neededIndexOptionsValue.IsBsonNull)
+                            {
+                                neededIndexOptionsDoc = neededIndex.ToBsonDocument().GetElement("Options").Value.ToBsonDocument();
+                            }
 
                             int matchedKeys = 0;
 
@@ -178,14 +185,17 @@ namespace Aura
 
                                 BsonElement value;
 
-                                if (neededIndexOptionsDoc.TryGetElement("unique", out value))
+                                if (neededIndexOptionsDoc != null)
                                 {
-                                    isUnique = value.Value.ToBoolean();
-                                }
+                                    if (neededIndexOptionsDoc.TryGetElement("unique", out value))
+                                    {
+                                        isUnique = value.Value.ToBoolean();
+                                    }
 
-                                if (neededIndexOptionsDoc.TryGetElement("sparse", out value))
-                                {
-                                    isSparse = value.Value.ToBoolean();
+                                    if (neededIndexOptionsDoc.TryGetElement("sparse", out value))
+                                    {
+                                        isSparse = value.Value.ToBoolean();
+                                    }
                                 }
 
                                 if (index.IsUnique != isUnique)

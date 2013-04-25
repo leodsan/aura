@@ -17,7 +17,7 @@ namespace Aura.SampleProject
 
         protected override void Initialize()
         {
-            EnsureIndex(IndexKeys.Ascending(PropertyName(x => x.TestField)), IndexOptions.SetUnique(false).SetSparse(false));
+            EnsureIndex(IndexKeys.Ascending(PropertyName(x => x.TestField)), IndexOptions.Null);
         }
     }
 }
