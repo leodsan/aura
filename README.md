@@ -9,7 +9,7 @@ The easiest way to get started with Aura is to
 3. Have a mongodb:// connection string in your connectionStrings
 ```
 <connectionStrings>
-    <add key="MyCoolMongoDatabase" value="mongodb://hostname/database" /> 
+    <add name="MyCoolMongoDatabase" connectionString="mongodb://hostname/database?safe=true" /> 
 </connectionStrings>
 ```
 3. Create the classes that you wish to store and retrieve with MongoDB.  This can be done of two ways:
@@ -97,7 +97,7 @@ public IEnumerable<Person> GetByLastName(string LastName) {
 
 ```
 <connectionStrings>
-    <add key="MyCoolMongoDatabase" value="mongodb://hostname/database" /> 
+    <add name="MyCoolMongoDatabase" connectionString="mongodb://hostname/database" /> 
 </connectionStrings>
 ```
 
