@@ -11,7 +11,9 @@ namespace Aura.SampleProject
         static void Main(string[] args)
         {
             AuraDatabaseManager manager = new AuraDatabaseManager();
-            manager.RecordManager.Save(new AuraSampleRecord { TestField = "test" });
+            manager.RecordManager.Save(new AuraSampleRecord { TestField = "test", TestSearchField = "foo"});
+            manager.RecordManager.Save(new AuraSampleRecord { TestField = "test 2", TestSearchField = "bar" });
+            var documents = manager.RecordManager.SearchForText("bar");
         }
     }
 }

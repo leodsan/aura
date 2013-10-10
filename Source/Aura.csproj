@@ -75,6 +75,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="API\CachingRecordManager.cs" />
+    <Compile Include="API\TextSearchResult.cs" />
     <Compile Include="Infrastructure\IMongoQueryExtensions.cs" />
     <Compile Include="API\IRecordManager.cs" />
     <Compile Include="Infrastructure\ListExtensionMethods.cs" />

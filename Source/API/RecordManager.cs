@@ -21,6 +21,7 @@ using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Linq;
 using log4net;
+using Aura.API;
 namespace Aura {
 
     /// <summary>
@@ -339,6 +340,27 @@ namespace Aura {
 			return find(criteria).SingleOrDefault();
 		}
 
+        /// <summary>
+        /// Executes a text search query against the collection
+        /// </summary>
+        /// <param name="query">The text search query to execute</param>
+        /// <returns>An enumerable of the text search results, which consists of the result object and score</returns>
+        protected internal virtual IEnumerable<TextSearchResult<T>> TextSearch(string query)
+        {
+            var database = Connection.GetInstance(ConnectionName);
+
+            var textSearchCommand = new CommandDocument
+            {
+                {"text", collection.Name},
+                {"search",query}
+            };
+
+            var commandResult = database.RunCommand(textSearchCommand);
+            var response = commandResult.Response;
+
+            return response["results"].AsBsonArray.Select(x => new TextSearchResult<T> { Score = x.AsBsonDocument["score"].AsDouble, Result = BsonSerializer.Deserialize<T>(x.AsBsonDocument["obj"].AsBsonDocument) });
+        }
+
 		/// <summary>
 		/// Event hook called becore a record is saved (either single or in batch).
 		/// </summary>
@@ -503,6 +525,22 @@ namespace Aura {
                 collection.EnsureIndex(keys, options);
             }
 		}
+
+        /// <summary>
+        /// Helper method to ensure a text index exists on the collection
+        /// </summary>
+        /// <param name="fields">The fields to create the text index against</param>
+        protected internal virtual void EnsureTextIndex(params string[] fields)
+        {
+            IndexKeysDocument keys = new IndexKeysDocument();
+
+            foreach (var field in fields)
+            {
+                keys.Add(field, "text");
+            }
+
+            EnsureIndex(keys, IndexOptions.Null);
+        }
 
 		/// <summary>
 		/// Convenience method to create a Query criteria based upon the ID field.

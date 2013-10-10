@@ -9,5 +9,6 @@ namespace Aura.SampleProject
     class AuraSampleRecord : Record
     {
         public string TestField { get; set; }
+        public string TestSearchField { get; set; }
     }
 }

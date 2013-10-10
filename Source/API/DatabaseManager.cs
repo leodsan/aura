@@ -159,24 +159,50 @@ namespace Aura
                             }
 
                             int matchedKeys = 0;
+                            int totalKeysInIndex = key.Elements.Count();
 
                             foreach (var elem in key.Elements)
                             {
-                                var field = elem.Name;
-                                int direction = elem.Value.AsInt32;
-
-                                BsonElement matchedElem = null;
-
-                                if (neededIndexKeysDoc.TryGetElement(field,out matchedElem))
+                                if (elem.Name == "_ftsx")
                                 {
-                                    if (matchedElem.Value.AsInt32 == direction)
+                                    continue;
+                                }
+
+                                if (elem.Name == "_fts")
+                                {
+                                     var weights = index.RawDocument.GetElement("weights");
+
+                                    var fullTextFields = neededIndexKeysDoc.Where(d => d.Value == "text").Select(x => x.Name);
+                                    totalKeysInIndex = weights.Value.AsBsonDocument.Elements.Count();
+
+                                    foreach (var field in fullTextFields)
                                     {
-                                        matchedKeys++;
+                                        BsonElement matchedElem = null;
+
+                                        if (weights.Value.AsBsonDocument.TryGetElement(field, out matchedElem))
+                                        {
+                                            matchedKeys++;
+                                        }
+                                    }
+
+                                } else {
+
+                                    var field = elem.Name;
+                                    int direction = elem.Value.AsInt32;
+
+                                    BsonElement matchedElem = null;
+
+                                    if (neededIndexKeysDoc.TryGetElement(field,out matchedElem))
+                                    {
+                                        if (matchedElem.Value.AsInt32 == direction)
+                                        {
+                                            matchedKeys++;
+                                        }
                                     }
                                 }
                             }
 
-                            if (matchedKeys == key.Elements.Count() && matchedKeys == neededIndexKeysDoc.Elements.Count())
+                            if (matchedKeys == totalKeysInIndex && matchedKeys == neededIndexKeysDoc.Elements.Count())
                             {
                                 doRemove = false;
 
