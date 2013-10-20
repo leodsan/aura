@@ -94,12 +94,21 @@ namespace Aura
                 if (instance == null && property.PropertyType.IsInterface)
                 {
                     type = typeof(RecordManager<>).MakeGenericType(genericType);
-                    instance = Activator.CreateInstance(type,true);
+                    instance = Activator.CreateInstance(type,(object)true);
                 }
 
                 if (instance == null && property.PropertyType.IsClass)
                 {
-                    instance = Activator.CreateInstance(property.PropertyType, true);
+                    var dbRecordConstructor = property.PropertyType.GetConstructor(new Type[] { typeof(Boolean) });
+
+                    if (dbRecordConstructor != null)
+                    {
+                        instance = dbRecordConstructor.Invoke(new object[] { true });
+                    }
+                    else
+                    {
+                        instance = Activator.CreateInstance(property.PropertyType);
+                    }
                 }
 
                 if (instance is RecordManager)

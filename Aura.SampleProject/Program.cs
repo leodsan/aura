@@ -13,7 +13,7 @@ namespace Aura.SampleProject
             AuraDatabaseManager manager = new AuraDatabaseManager();
             manager.RecordManager.Save(new AuraSampleRecord { TestField = "test", TestSearchField = "foo"});
             manager.RecordManager.Save(new AuraSampleRecord { TestField = "test 2", TestSearchField = "bar" });
-            var documents = manager.RecordManager.SearchForText("bar");
+            //var documents = manager.RecordManager.SearchForText("bar");
         }
     }
 }

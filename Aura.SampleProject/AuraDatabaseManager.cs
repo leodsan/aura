@@ -9,5 +9,6 @@ namespace Aura.SampleProject
     class AuraDatabaseManager : DatabaseManager
     {
         public AuraSampleRecordManager RecordManager { get; set; }
+        public RecordManager<AuraSampleRecord> RecordManager2 { get; set; }
     }
 }
